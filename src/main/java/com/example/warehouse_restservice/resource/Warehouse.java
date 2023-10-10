@@ -9,9 +9,10 @@ import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
-public class Warehouse {
+public class Warehouse implements com.example.warehouse_restservice.resource.interfaces.IWarehouse {
     private final CopyOnWriteArrayList<Product> products = new CopyOnWriteArrayList<>();
 
+    @Override
     public boolean addProduct(String name, Category category, int rating, LocalDate creationDate, Boolean isTest, int testId) {
         if(name.trim().isEmpty()){
             System.out.println("Can't add products without name");
@@ -29,35 +30,42 @@ public class Warehouse {
         return true;
     }
 
+    @Override
     public List<ProductRecord> getAllProducts(){
         setupTestProducts();
         return products.stream().map(this::createRecordFromProduct).toList();
     }
 
+    @Override
     public Optional<ProductRecord> getProductRecordById(UUID id) {
         setupTestProducts();
         return products.stream()
                 .filter(p -> p.getId().equals(id)).map(this::createRecordFromProduct).findFirst();
     }
 
+    @Override
     public Optional<Product> getProductById(UUID id) {
         return products.stream()
                 .filter(p -> p.getId().equals(id)).findFirst();
     }
 
+    @Override
     public List<ProductRecord> getAllProductsInCategory(Category category){
         setupTestProducts();
         return products.stream().filter(p -> p.getCategory().equals(category)).map(this::createRecordFromProduct).sorted(Comparator.comparing(ProductRecord::name)).toList();
     }
 
+    @Override
     public List<ProductRecord> getAllProductsCreatedSince(LocalDate createdDate){
         return products.stream().filter(p -> p.getCreatedDate().isAfter(createdDate)).map(this::createRecordFromProduct).toList();
     }
 
+    @Override
     public List<ProductRecord> getAllModifiedProducts(){
         return products.stream().filter(p -> p.getModifiedDate() != p.getCreatedDate()).map(this::createRecordFromProduct).toList();
     }
 
+    @Override
     public List<Category> getAllCategoriesWithOneOrMoreProducts(){
         List<Category> categoriesWithProducts = new ArrayList<>();
         List<ProductRecord> tempProducts;
@@ -70,10 +78,12 @@ public class Warehouse {
         return categoriesWithProducts;
     }
 
+    @Override
     public long getNumberOfProductsInCategory(Category category){
         return products.stream().filter(p ->p.getCategory().equals(category)).count();
     }
 
+    @Override
     public List<ProductRecord> getProductsWithMaxRatingSortedByDate(){
         int maxRating = 10;
         return products.stream()
@@ -84,6 +94,7 @@ public class Warehouse {
                 .toList();
     }
 
+    @Override
     public boolean modifyProduct(UUID id, String name, Category category, int rating) throws Exception {
         Optional<Product> productWrapper = getProductById(id);
         if (productWrapper.isEmpty()) {
@@ -115,6 +126,7 @@ public class Warehouse {
         return true;
     }
 
+    @Override
     public Map<String, Long> getProductLetterAndProductCount(){
         return products.stream()
                 .collect(Collectors
