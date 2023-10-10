@@ -6,10 +6,11 @@ import com.example.warehouse_restservice.resource.entities.ProductRecord;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 public class Warehouse {
-    private final ArrayList<Product> products = new ArrayList<>();
+    private final CopyOnWriteArrayList<Product> products = new CopyOnWriteArrayList<>();
 
     public boolean addProduct(String name, Category category, int rating, LocalDate creationDate, Boolean isTest, int testId) {
         if(name.trim().isEmpty()){
@@ -34,6 +35,7 @@ public class Warehouse {
     }
 
     public Optional<ProductRecord> getProductRecordById(UUID id) {
+        setupTestProducts();
         return products.stream()
                 .filter(p -> p.getId().equals(id)).map(this::createRecordFromProduct).findFirst();
     }
