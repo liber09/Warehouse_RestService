@@ -1,6 +1,7 @@
 package com.example.warehouse_restservice;
 
 import com.example.warehouse_restservice.resource.Warehouse;
+import com.example.warehouse_restservice.resource.entities.Category;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -27,7 +28,13 @@ public class WarehouseResource {
         return warehouse.getProductRecordById(id).toString();
     }
 
-
-
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/category/{category}")
+    public String getAllProductsInCategory(@PathParam("category") String wantedCategory){
+        Warehouse warehouse = new Warehouse();
+        Category category = Category.valueOf(wantedCategory.toUpperCase());
+        return warehouse.getAllProductsInCategory(category).toString();
+    }
 
 }

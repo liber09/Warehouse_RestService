@@ -46,6 +46,7 @@ public class Warehouse {
     }
 
     public List<ProductRecord> getAllProductsInCategory(Category category){
+        setupTestProducts();
         return products.stream().filter(p -> p.getCategory().equals(category)).map(this::createRecordFromProduct).sorted(Comparator.comparing(ProductRecord::name)).toList();
     }
 
