@@ -13,7 +13,7 @@ public class Warehouse implements com.example.warehouse_restservice.resource.int
     private final CopyOnWriteArrayList<Product> products = new CopyOnWriteArrayList<>();
 
     @Override
-    public boolean addProduct(String name, Category category, int rating, LocalDate creationDate, Boolean isTest, int testId) {
+    public boolean addProduct(String name, Category category, int rating, String creationDate, Boolean isTest, int testId) {
         if(name.trim().isEmpty()){
             System.out.println("Can't add products without name");
             return false;
@@ -141,7 +141,7 @@ public class Warehouse implements com.example.warehouse_restservice.resource.int
     }
 
     private void setupTestProducts(){
-        LocalDate dateLastMonth = LocalDate.of(LocalDate.now().getYear(), LocalDate.now().getMonth().minus(1), LocalDate.now().getDayOfMonth());
+        String dateLastMonth = LocalDate.of(LocalDate.now().getYear(), LocalDate.now().getMonth().minus(1), LocalDate.now().getDayOfMonth()).toString();
 
         addProduct("Diesel tshirt",Category.TSHIRTS,5,dateLastMonth, true, 1);
         addProduct("Calvin Klein tshirt",Category.TSHIRTS,7,dateLastMonth, true, 2);

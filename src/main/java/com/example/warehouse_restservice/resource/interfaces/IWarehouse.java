@@ -11,7 +11,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface IWarehouse {
-    boolean addProduct(String name, Category category, int rating, LocalDate creationDate, Boolean isTest, int testId);
+    boolean addProduct(String name, Category category, int rating, String creationDate, Boolean isTest, int testId);
 
     List<ProductRecord> getAllProducts();
 

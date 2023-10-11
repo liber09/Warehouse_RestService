@@ -21,15 +21,19 @@ public class Product implements Serializable {
     @Positive(message = "Rating must be at least 1")
     @Max(message = "Rating cannot be higher than 10", value = 10L)
     private int rating;
-    @PastOrPresent(message = "Created date cannot be in the future")
-    private LocalDate createdDate;
+    @NotEmpty(message = "Date created cannot be empty")
+    private String dateCreatedString;
+    private final LocalDate createdDate;
     private LocalDate modifiedDate;
+
 
     public Product() {
         IUuidProvider uuidProvider = new RandomUuidProvider();
         this.id = uuidProvider.uuid();
+        this.createdDate = LocalDate.now();
+        this.modifiedDate = createdDate;
     }
-    public Product(String name, Category category, int rating, LocalDate creationDate, Boolean isTest, int testId) {
+    public Product(String name, Category category, int rating, String dateCreatedString, Boolean isTest, int testId) {
         if(!isTest){
             IUuidProvider UuidProvider = new RandomUuidProvider();
             this.id = UuidProvider.uuid();
@@ -41,7 +45,7 @@ public class Product implements Serializable {
         this.name = name;
         this.category = category;
         this.rating = rating;
-        this.createdDate = creationDate;
+        this.createdDate = LocalDate.parse(dateCreatedString);
         this.modifiedDate = createdDate;
     }
 
@@ -75,6 +79,12 @@ public class Product implements Serializable {
         }
     }
 
+    public void setDateCreatedString(String value){
+        if (!value.isEmpty()){
+            this.dateCreatedString = value;
+        }
+    }
+
     public String getName(){
         return this.name;
     }
@@ -93,5 +103,21 @@ public class Product implements Serializable {
 
     public LocalDate getModifiedDate(){
         return this.modifiedDate;
+    }
+
+    public String getDateCreatedString(){
+        return this.dateCreatedString;
+    }
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "id=" + id +
+                ", dateCreated=" + createdDate +
+                ", rating=" + rating +
+                ", name='" + name + '\'' +
+                ", category=" + category +
+                ", dateLastModified=" + modifiedDate +
+                '}';
     }
 }
