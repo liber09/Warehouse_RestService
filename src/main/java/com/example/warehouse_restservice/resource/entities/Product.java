@@ -2,26 +2,40 @@ package com.example.warehouse_restservice.resource.entities;
 
 import com.example.warehouse_restservice.resource.entities.helpers.FakeUuidProvider;
 import com.example.warehouse_restservice.resource.entities.helpers.RandomUuidProvider;
-import com.example.warehouse_restservice.resource.interfaces.UuidProvider;
+import com.example.warehouse_restservice.resource.interfaces.IUuidProvider;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Positive;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.UUID;
 
-public class Product {
+public class Product implements Serializable {
     private final UUID id;
+    @NotEmpty(message = "A product name must be provided")
     private String name;
+    @NotEmpty(message = "Product must belong to a category")
     private Category category;
+    @Positive(message = "Rating must be at least 1")
+    @Max(message = "Rating cannot be higher than 10", value = 10L)
     private int rating;
-    private final LocalDate createdDate;
+    @PastOrPresent(message = "Created date cannot be in the future")
+    private LocalDate createdDate;
     private LocalDate modifiedDate;
 
+    public Product() {
+        IUuidProvider uuidProvider = new RandomUuidProvider();
+        this.id = uuidProvider.uuid();
+    }
     public Product(String name, Category category, int rating, LocalDate creationDate, Boolean isTest, int testId) {
         if(!isTest){
-            UuidProvider uuidProvider = new RandomUuidProvider();
-            this.id = uuidProvider.uuid();
+            IUuidProvider UuidProvider = new RandomUuidProvider();
+            this.id = UuidProvider.uuid();
         }else{
-            UuidProvider uuidProviderTest = new FakeUuidProvider();
-            this.id = uuidProviderTest.genterateUuid(testId);
+            IUuidProvider IUuidProviderTest = new FakeUuidProvider();
+            this.id = IUuidProviderTest.genterateUuid(testId);
         }
 
         this.name = name;

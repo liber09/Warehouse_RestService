@@ -1,11 +1,11 @@
 package com.example.warehouse_restservice.resource.entities.helpers;
 
-import com.example.warehouse_restservice.resource.interfaces.UuidProvider;
+import com.example.warehouse_restservice.resource.interfaces.IUuidProvider;
 
 import java.util.UUID;
 
 //Class used only by tests to be able to handle testcases when we need to know the UUID that has been created
-public class FakeUuidProvider implements UuidProvider {
+public class FakeUuidProvider implements IUuidProvider {
 
     public UUID genterateUuid(int testId){
         return UUID.fromString("0000-00-00-00-0000"+testId);
