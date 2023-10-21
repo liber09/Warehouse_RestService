@@ -13,6 +13,8 @@ import java.util.UUID;
 public interface IWarehouse {
     boolean addProduct(String name, Category category, int rating, String creationDate, Boolean isTest, int testId);
 
+    boolean addProduct(Product product);
+
     List<ProductRecord> getAllProducts();
 
     Optional<ProductRecord> getProductRecordById(UUID id);

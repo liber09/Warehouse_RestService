@@ -39,12 +39,10 @@ public class WarehouseResource {
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.TEXT_PLAIN)
-    public String addProduct(Product product){
-
+    @Produces(MediaType.APPLICATION_JSON)
+    public Boolean addProduct(Product product){
         IWarehouse warehouse = new Warehouse();
-        return product.toString();
-        //return warehouse.addProduct(product.getName(), product.getCategory(), product.getRating(), product.getCreatedDate(),false,0);
+        return warehouse.addProduct(product);
     }
 
 

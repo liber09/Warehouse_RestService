@@ -3,10 +3,7 @@ package com.example.warehouse_restservice.resource.entities;
 import com.example.warehouse_restservice.resource.entities.helpers.FakeUuidProvider;
 import com.example.warehouse_restservice.resource.entities.helpers.RandomUuidProvider;
 import com.example.warehouse_restservice.resource.interfaces.IUuidProvider;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.PastOrPresent;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.*;
 
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -16,7 +13,7 @@ public class Product implements Serializable {
     private final UUID id;
     @NotEmpty(message = "A product name must be provided")
     private String name;
-    @NotEmpty(message = "Product must belong to a category")
+    @NotNull(message = "Product must belong to a category")
     private Category category;
     @Positive(message = "Rating must be at least 1")
     @Max(message = "Rating cannot be higher than 10", value = 10L)
