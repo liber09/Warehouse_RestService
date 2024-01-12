@@ -3,6 +3,7 @@ package com.example.warehouse_restservice.resource;
 import com.example.warehouse_restservice.resource.entities.Category;
 import com.example.warehouse_restservice.resource.entities.Product;
 import com.example.warehouse_restservice.resource.entities.ProductRecord;
+import jakarta.enterprise.inject.Default;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -11,18 +12,17 @@ import jakarta.validation.ValidatorFactory;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Collectors;
 
-public class Warehouse implements com.example.warehouse_restservice.resource.interfaces.IWarehouse {
-    private final CopyOnWriteArrayList<Product> products = new CopyOnWriteArrayList<>();
+@Default
+public class Warehouse {
+    private final CopyOnWriteArrayList<Product> products = new CopyOnWriteArrayList<Product>();
     ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
     Validator validator = factory.getValidator();
 
-    @Override
-    public boolean addProduct(String name, Category category, int rating, String creationDate, Boolean isTest, int testId) {
+
+    public void addProduct(String name, Category category, int rating, String creationDate, Boolean isTest, int testId) {
         if(name.trim().isEmpty()){
-            System.out.println("Can't add products without name");
-            return false;
+            throw new IllegalArgumentException("Name can not be empty");
         }
 
         if (category == null){
@@ -37,121 +37,35 @@ public class Warehouse implements com.example.warehouse_restservice.resource.int
         }
         products.add(newProduct);
 
-        return true;
-    }
-    @Override
-    public boolean addProduct(Product product){
-        int productCount = products.size();
-        products.add(product);
-        int newProductCount = products.size();
-        if (newProductCount > productCount){
-            return true;
-        }
-        return false;
     }
 
-    @Override
+    public void addProduct(Product product){
+        products.add(product);
+    }
+
+
     public List<ProductRecord> getAllProducts(){
         setupTestProducts();
         return products.stream().map(this::createRecordFromProduct).toList();
     }
 
-    @Override
+
     public Optional<ProductRecord> getProductRecordById(UUID id) {
         setupTestProducts();
         return products.stream()
                 .filter(p -> p.getId().equals(id)).map(this::createRecordFromProduct).findFirst();
     }
 
-    @Override
+
     public Optional<Product> getProductById(UUID id) {
         return products.stream()
                 .filter(p -> p.getId().equals(id)).findFirst();
     }
 
-    @Override
+
     public List<ProductRecord> getAllProductsInCategory(Category category){
         setupTestProducts();
         return products.stream().filter(p -> p.getCategory().equals(category)).map(this::createRecordFromProduct).sorted(Comparator.comparing(ProductRecord::name)).toList();
-    }
-
-    @Override
-    public List<ProductRecord> getAllProductsCreatedSince(LocalDate createdDate){
-        return products.stream().filter(p -> p.getCreatedDate().isAfter(createdDate)).map(this::createRecordFromProduct).toList();
-    }
-
-    @Override
-    public List<ProductRecord> getAllModifiedProducts(){
-        return products.stream().filter(p -> p.getModifiedDate() != p.getCreatedDate()).map(this::createRecordFromProduct).toList();
-    }
-
-    @Override
-    public List<Category> getAllCategoriesWithOneOrMoreProducts(){
-        List<Category> categoriesWithProducts = new ArrayList<>();
-        List<ProductRecord> tempProducts;
-        for (Category category : EnumSet.allOf(Category.class)) {
-            tempProducts = getAllProductsInCategory(category);
-            if (!tempProducts.isEmpty()) {
-                categoriesWithProducts.add(category);
-            }
-        }
-        return categoriesWithProducts;
-    }
-
-    @Override
-    public long getNumberOfProductsInCategory(Category category){
-        return products.stream().filter(p ->p.getCategory().equals(category)).count();
-    }
-
-    @Override
-    public List<ProductRecord> getProductsWithMaxRatingSortedByDate(){
-        int maxRating = 10;
-        return products.stream()
-                .filter(p -> p.getRating() == maxRating &&
-                        p.getCreatedDate().getMonth().equals(LocalDate.now().getMonth()))
-                .map(this::createRecordFromProduct)
-                .sorted(Comparator.comparing(ProductRecord::creationDate))
-                .toList();
-    }
-
-    @Override
-    public boolean modifyProduct(UUID id, String name, Category category, int rating) throws Exception {
-        Optional<Product> productWrapper = getProductById(id);
-        if (productWrapper.isEmpty()) {
-            throw(new Exception("No product to modify"));
-        } else {
-            LocalDate modifiedDate = LocalDate.now();
-            Product product = productWrapper.get();
-            if (!name.isEmpty()){
-                product.setName(name);
-                product.setModifiedDate(modifiedDate);
-            } else {
-                throw(new IllegalArgumentException("Product must have a name"));
-            }
-
-            if (!(category == null)){
-                product.setCategory(category);
-                product.setModifiedDate(modifiedDate);
-            } else {
-                throw(new IllegalArgumentException("Product must belong to a category"));
-            }
-
-            if (rating >= 0 && rating <= 10){
-                product.setRating(rating);
-                product.setModifiedDate(modifiedDate);
-            } else{
-                throw(new IllegalArgumentException("Rating must be between 0 and 10"));
-            }
-        }
-        return true;
-    }
-
-    @Override
-    public Map<String, Long> getProductLetterAndProductCount(){
-        return products.stream()
-                .collect(Collectors
-                        .groupingBy(product -> product.getName().substring(0,1),
-                                Collectors.counting()));
     }
 
     private ProductRecord createRecordFromProduct(Product product){
@@ -176,6 +90,5 @@ public class Warehouse implements com.example.warehouse_restservice.resource.int
             addProduct("Calvin Klein skinny jeans",Category.JEANS,10,dateLastMonth, true,10);
             addProduct("Nike shoes", Category.SHOES, 10, dateLastMonth, true,11);
         }
-
     }
 }
