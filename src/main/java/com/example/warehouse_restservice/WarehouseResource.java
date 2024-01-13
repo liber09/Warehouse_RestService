@@ -3,7 +3,6 @@ import com.example.warehouse_restservice.resource.Warehouse;
 import com.example.warehouse_restservice.resource.entities.Category;
 import com.example.warehouse_restservice.resource.entities.Product;
 import com.example.warehouse_restservice.resource.entities.ProductRecord;
-import com.example.warehouse_restservice.resource.entities.helpers.JacksonObjectMapper;
 import com.example.warehouse_restservice.resource.interceptors.Log;
 import jakarta.inject.Inject;
 import jakarta.interceptor.Interceptors;
@@ -23,13 +22,8 @@ import java.util.UUID;
 @Interceptors(Log.class)
 public class WarehouseResource {
     private final static Logger logger = LoggerFactory.getLogger(ProductRecord.class);
-    private final JacksonObjectMapper objectMapper;
-    private final Warehouse warehouse;
     @Inject
-    public WarehouseResource(){
-        objectMapper = new JacksonObjectMapper();
-        this.warehouse = new Warehouse();
-    }
+    private Warehouse warehouse;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -44,8 +38,6 @@ public class WarehouseResource {
 
         // Sort the mutable copy
         mutableProducts.sort(Comparator.comparing(ProductRecord::id));
-
-        // Now you can use the sorted list or perform other operations
 
         return Response.status(Response.Status.OK)
                 .entity(mutableProducts)  // Return the sorted list in the response
@@ -71,8 +63,14 @@ public class WarehouseResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public void addProduct(@Valid Product product){
-        warehouse.addProduct(product);
+    public Response addProduct(@Valid Product product){
+        try {
+            warehouse.addProduct(product);
+            return Response.status(Response.Status.CREATED).build();
+        } catch (Exception e) {
+            logger.error("Error adding product", e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error adding product").build();
+        }
 
     }
 

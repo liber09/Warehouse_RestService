@@ -3,38 +3,28 @@ package com.example.warehouse_restservice.resource;
 import com.example.warehouse_restservice.resource.entities.Category;
 import com.example.warehouse_restservice.resource.entities.Product;
 import com.example.warehouse_restservice.resource.entities.ProductRecord;
-import jakarta.enterprise.inject.Default;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validation;
-import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
+import jakarta.annotation.PostConstruct;
+import jakarta.enterprise.context.ApplicationScoped;
 
 import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-@Default
+@ApplicationScoped
 public class Warehouse {
-    private final CopyOnWriteArrayList<Product> products = new CopyOnWriteArrayList<Product>();
-    ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-    Validator validator = factory.getValidator();
 
+    public Warehouse(){
+        setupTestProducts();
+    }
+
+    @PostConstruct
+    public void initialize() {
+        setupTestProducts();
+    }
+    private final CopyOnWriteArrayList<Product> products = new CopyOnWriteArrayList<>();
 
     public void addProduct(String name, Category category, int rating, String creationDate, Boolean isTest, int testId) {
-        if(name.trim().isEmpty()){
-            throw new IllegalArgumentException("Name can not be empty");
-        }
-
-        if (category == null){
-            category = Category.OTHER;
-        }
-
         Product newProduct = new Product(name,category,rating, creationDate, isTest, testId);
-        Set<ConstraintViolation<Product>> violations = validator.validate(newProduct);
-        ArrayList<String> errors = new ArrayList<>();
-        for (ConstraintViolation<Product> violation : violations) {
-            errors.add(violation.getMessage());
-        }
         products.add(newProduct);
 
     }
@@ -45,26 +35,16 @@ public class Warehouse {
 
 
     public List<ProductRecord> getAllProducts(){
-        setupTestProducts();
         return products.stream().map(this::createRecordFromProduct).toList();
     }
 
 
     public Optional<ProductRecord> getProductRecordById(UUID id) {
-        setupTestProducts();
         return products.stream()
                 .filter(p -> p.getId().equals(id)).map(this::createRecordFromProduct).findFirst();
     }
 
-
-    public Optional<Product> getProductById(UUID id) {
-        return products.stream()
-                .filter(p -> p.getId().equals(id)).findFirst();
-    }
-
-
     public List<ProductRecord> getAllProductsInCategory(Category category){
-        setupTestProducts();
         return products.stream().filter(p -> p.getCategory().equals(category)).map(this::createRecordFromProduct).sorted(Comparator.comparing(ProductRecord::name)).toList();
     }
 
