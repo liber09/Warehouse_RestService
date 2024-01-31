@@ -1,11 +1,10 @@
-name: docker-cd
+name: docker-build-push
 
 on:
-  workflow_run:
-    workflows: ["maven-ci"]
-    types:
-      - completed
-
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
   build:
